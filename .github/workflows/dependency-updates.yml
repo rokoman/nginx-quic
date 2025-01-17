@@ -350,7 +350,7 @@ jobs:
         with:
           signoff: true
           delete-branch: true
-          commit-message: update nginx version to ${{ steps.update.outputs.version }}
+          commit-message: update lua-resty-core version to ${{ steps.update.outputs.version }}
           branch: update-lua-resty-core-version
           title: update lua-resty-core version to ${{ steps.update.outputs.version }}
           body: update lua-resty-core version to ${{ steps.update.outputs.version }}
