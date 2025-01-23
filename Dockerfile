@@ -76,6 +76,7 @@ RUN git clone --recursive https://github.com/freenginx/nginx --branch "$NGINX_VE
 RUN cd /src/nginx && \
     /src/nginx/auto/configure \
     --build=freenginx \
+    --with-debug \
     --with-compat \
     --with-threads \
     --with-file-aio \
