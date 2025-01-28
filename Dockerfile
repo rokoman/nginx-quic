@@ -51,7 +51,7 @@ RUN git clone --recursive https://github.com/freenginx/nginx --branch "$NGINX_VE
     wget -q https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-"$RCP_VER"-resolver_conf_parsing.patch -O /src/nginx/2.patch && \
     sed -i "s|freenginx|NPMplus|g" /src/nginx/src/core/nginx.h && \
     sed -i "/<hr><center>/d" /src/nginx/src/http/ngx_http_special_response.c && \
-    sed -i "s|<h1>|<h1 style=\"display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;\">|g" /src/nginx/src/core/nginx.h && \
+    sed -i "s|<h1>|<h1 style=\"display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;\">|g" /src/nginx/src/http/ngx_http_special_response.c && \
     git diff && \
     git apply /src/nginx/1.patch && \
     git apply /src/nginx/2.patch && \
