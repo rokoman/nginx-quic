@@ -14,7 +14,7 @@ COPY --from=zoeyvid/nginx-quic:latest /etc/ssl/openssl.cnf                 /etc/
 COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libmodsecurity.so.3   /usr/local/lib/libmodsecurity.so.3
 COPY --from=zoeyvid/nginx-quic:latest /usr/lib/ossl-modules/oqsprovider.so /usr/lib/ossl-modules/oqsprovider.so
 RUN apk upgrade --no-cache -a && \
-    apk add --no-cache ca-certificates tzdata tini zlib luajit pcre2 libstdc++ yajl libxml2 libxslt libcurl lmdb libfuzzy2 lua5.1-libs geoip libmaxminddb-libs openssl && \
+    apk add --no-cache ca-certificates tzdata tini zlib luajit pcre2 libstdc++ yajl libxml2 libcurl lmdb libfuzzy2 lua5.1-libs geoip libmaxminddb-libs openssl && \
     ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/nginx
 COPY --from=certbot /usr/local /usr/local
 
