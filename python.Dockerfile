@@ -10,6 +10,7 @@ FROM python:3.13.1-alpine3.21
 ENV PYTHONUNBUFFERED=1
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 COPY --from=zoeyvid/nginx-quic:latest /usr/local/nginx                     /usr/local/nginx
+COPY --from=zoeyvid/nginx-quic:latest /etc/ssl/openssl.cnf                 /etc/ssl/openssl.cnf
 COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libmodsecurity.so.3   /usr/local/lib/libmodsecurity.so.3
 COPY --from=zoeyvid/nginx-quic:latest /usr/lib/ossl-modules/oqsprovider.so /usr/lib/ossl-modules/oqsprovider.so
 RUN apk upgrade --no-cache -a && \
