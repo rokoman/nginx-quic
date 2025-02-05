@@ -73,7 +73,7 @@ RUN git clone --recursive https://github.com/nginx/nginx --branch "$NGINX_VER" /
 # Configure
 RUN cd /src/nginx && \
     /src/nginx/auto/configure \
-    --build=freenginx \
+    --build=nginx \
     --with-debug \
     --with-compat \
     --with-threads \
