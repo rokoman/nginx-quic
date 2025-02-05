@@ -135,7 +135,7 @@ RUN git clone https://github.com/open-quantum-safe/oqs-provider --branch "$OQSPR
 # strip files
 RUN strip -s /usr/local/nginx/sbin/nginx && \
     strip -s /src/oqs-provider/lib/oqsprovider.so && \
-    strip -s /usr/local/modsecurity/lib/libmodsecurity.so.3 && \
+    strip -s /usr/local/modsecurity/lib/libmodsecurity.so.3; \
     find /usr/local/nginx -exec file {} \; | grep "not stripped" || true
 
 FROM alpine:3.21.2
