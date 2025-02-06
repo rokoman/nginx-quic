@@ -27,22 +27,23 @@ ARG LIBOQS_VER=0.12.0
 ARG OQSPROVIDER_VER=0.8.0
 
 WORKDIR /src
+COPY attachment.patch /src/attachment.patch
 # Requirements
 RUN apk upgrade --no-cache -a && \
     apk add --no-cache ca-certificates build-base cmake git libtool autoconf automake bash \
-    libatomic_ops-dev zlib-dev luajit-dev pcre2-dev linux-headers yajl-dev libxml2-dev libxslt-dev curl-dev lmdb-dev libfuzzy2-dev lua5.1-dev lmdb-dev geoip-dev libmaxminddb-dev
+    libatomic_ops-dev zlib-dev luajit-dev pcre2-dev linux-headers yajl-dev libxml2-dev libxslt-dev curl-dev lmdb-dev libfuzzy2-dev lua5.1-dev lmdb-dev geoip-dev libmaxminddb-dev && \
 # ModSecurity
-RUN git clone --recursive https://github.com/owasp-modsecurity/ModSecurity --branch "$MODSEC_VER" /src/ModSecurity && \
+    git clone --recursive https://github.com/owasp-modsecurity/ModSecurity --branch "$MODSEC_VER" /src/ModSecurity && \
+    cd /src/ModSecurity && \
     sed -i "s|SecRuleEngine .*|SecRuleEngine On|g" /src/ModSecurity/modsecurity.conf-recommended && \
     sed -i "s|^SecAudit|#SecAudit|g" /src/ModSecurity/modsecurity.conf-recommended && \
     sed -i "s|unicode.mapping|/usr/local/nginx/conf/conf.d/include/unicode.mapping|g" /src/ModSecurity/modsecurity.conf-recommended && \
-    cd /src/ModSecurity && \
     /src/ModSecurity/build.sh && \
     /src/ModSecurity/configure --with-pcre2 --with-lmdb && \
     make -j "$(nproc)" && \
-    make -j "$(nproc)" install
+    make -j "$(nproc)" install && \
 # Nginx
-RUN git clone --recursive https://github.com/nginx/nginx --branch "$NGINX_VER" /src/nginx && \
+    git clone --recursive https://github.com/nginx/nginx --branch "$NGINX_VER" /src/nginx && \
     cd /src/nginx && \
     wget -q https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/83bc5c6318612419f14b45b46857a3b2d285608e/nginx__dynamic_tls_records_"$DTR_VER"%2B.patch -O /src/nginx/1.patch && \
     wget -q https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-"$RCP_VER"-resolver_conf_parsing.patch -O /src/nginx/2.patch && \
@@ -52,7 +53,7 @@ RUN git clone --recursive https://github.com/nginx/nginx --branch "$NGINX_VER" /
     git diff && \
     git apply /src/nginx/1.patch && \
     git apply /src/nginx/2.patch && \
-    rm /src/nginx/*.patch && \
+    rm -v /src/nginx/*.patch && \
 # modules
     git clone --recursive https://github.com/google/ngx_brotli --branch "$NB_VER" /src/ngx_brotli && \
     git clone --recursive https://github.com/aperezdc/ngx-fancyindex --branch "$NF_VER" /src/ngx-fancyindex && \
@@ -69,9 +70,9 @@ RUN git clone --recursive https://github.com/nginx/nginx --branch "$NGINX_VER" /
     cd /src/ModSecurity-nginx && \
     wget -q https://patch-diff.githubusercontent.com/raw/owasp-modsecurity/ModSecurity-nginx/pull/320.patch -O /src/ModSecurity-nginx/1.patch && \
     git apply /src/ModSecurity-nginx/1.patch && \
-    rm /src/ModSecurity-nginx/*.patch
+    rm -v /src/ModSecurity-nginx/*.patch && \
 # Configure
-RUN cd /src/nginx && \
+    cd /src/nginx && \
     /src/nginx/auto/configure \
     --build=nginx \
     --with-debug \
@@ -108,36 +109,36 @@ RUN cd /src/nginx && \
     --add-module=/src/lua-nginx-module \
     --add-module=/src/ModSecurity-nginx \
     --add-module=/src/ngx_http_geoip2_module \
-    --add-module=/src/nginx-ntlm-module
-RUN git clone https://github.com/openappsec/attachment /src/attachment
-COPY attachment.patch /src/attachment/attachment.patch
-RUN cd /src/attachment && \
-    patch -p1 </src/attachment/attachment.patch && \
-    cmake /src/attachment && \
-    make install
+    --add-module=/src/nginx-ntlm-module && \
 # Build & Install
-RUN cd /src/nginx && \
     make -j "$(nproc)" && \
     make -j "$(nproc)" install && \
     cd /src/lua-resty-core && \
     make -j "$(nproc)" install PREFIX=/usr/local/nginx && \
     cd /src/lua-resty-lrucache && \
-    make -j "$(nproc)" install PREFIX=/usr/local/nginx
-# OQS
-RUN git clone https://github.com/open-quantum-safe/liboqs --branch "$LIBOQS_VER" /src/liboqs && \
+    make -j "$(nproc)" install PREFIX=/usr/local/nginx && \
+# openappsec attachment
+    git clone https://github.com/openappsec/attachment /src/attachment && \
+    cd /src/attachment && \
+    patch -p1 </src/attachment.patch && \
+    rm -v /src/attachment.patch && \
+    cmake /src/attachment && \
+    make -j "$(nproc)" install && \
+# liboqs
+    git clone https://github.com/open-quantum-safe/liboqs --branch "$LIBOQS_VER" /src/liboqs && \
     cd /src/liboqs && \
     cmake -DCMAKE_BUILD_TYPE=Release && \
     make -j "$(nproc)" && \
-    make -j "$(nproc)" install
-RUN git clone https://github.com/open-quantum-safe/oqs-provider --branch "$OQSPROVIDER_VER" /src/oqs-provider && \
+    make -j "$(nproc)" install && \
+# oqs-provider
+    git clone https://github.com/open-quantum-safe/oqs-provider --branch "$OQSPROVIDER_VER" /src/oqs-provider && \
     cd /src/oqs-provider && \
     cmake -DCMAKE_BUILD_TYPE=Release && \
-    make -j "$(nproc)"
+    make -j "$(nproc)" && \
 # strip files
-RUN strip -s /usr/local/nginx/sbin/nginx && \
+    strip -s /usr/local/nginx/sbin/nginx && \
     strip -s /src/oqs-provider/lib/oqsprovider.so && \
     strip -s /usr/local/modsecurity/lib/libmodsecurity.so.3
-RUN find /usr/local/nginx -exec file {} \; | grep "not stripped" || true
 
 FROM alpine:3.21.2
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
