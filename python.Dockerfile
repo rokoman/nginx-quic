@@ -9,10 +9,14 @@ RUN apk upgrade --no-cache -a && \
 FROM python:3.13.1-alpine3.21
 ENV PYTHONUNBUFFERED=1
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
-COPY --from=zoeyvid/nginx-quic:latest /usr/local/nginx                     /usr/local/nginx
-COPY --from=zoeyvid/nginx-quic:latest /etc/ssl/openssl.cnf                 /etc/ssl/openssl.cnf
-COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libmodsecurity.so.3   /usr/local/lib/libmodsecurity.so.3
-COPY --from=zoeyvid/nginx-quic:latest /usr/lib/ossl-modules/oqsprovider.so /usr/lib/ossl-modules/oqsprovider.so
+COPY --from=zoeyvid/nginx-quic:latest /usr/local/nginx                                /usr/local/nginx
+COPY --from=zoeyvid/nginx-quic:latest /etc/ssl/openssl.cnf                            /etc/ssl/openssl.cnf
+COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libmodsecurity.so.3              /usr/local/lib/libmodsecurity.so.3
+COPY --from=zoeyvid/nginx-quic:latest /usr/lib/ossl-modules/oqsprovider.so            /usr/lib/ossl-modules/oqsprovider.so
+COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libngx_module.so                 /usr/local/lib/libngx_module.so
+COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libosrc_shmem_ipc.so             /usr/local/lib/libosrc_shmem_ipc.so
+COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libosrc_compression_utils.so     /usr/local/lib/libosrc_compression_utils.so
+COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libosrc_nginx_attachment_util.so /usr/local/lib/libosrc_nginx_attachment_util.so
 RUN apk upgrade --no-cache -a && \
     apk add --no-cache ca-certificates tzdata tini zlib luajit pcre2 libstdc++ yajl libxml2 libxslt libcurl lmdb libfuzzy2 lua5.1-libs geoip libmaxminddb-libs openssl && \
     ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/nginx
