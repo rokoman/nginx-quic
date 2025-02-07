@@ -45,7 +45,7 @@ RUN apk upgrade --no-cache -a && \
 # Nginx
     git clone --recursive https://github.com/nginx/nginx --branch "$NGINX_VER" /src/nginx && \
     cd /src/nginx && \
-    wget -q https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/83bc5c6318612419f14b45b46857a3b2d285608e/nginx__dynamic_tls_records_"$DTR_VER"%2B.patch -O /src/nginx/1.patch && \
+    wget -q https://raw.githubusercontent.com/nginx-modules/ngx_http_tls_dyn_size/master/nginx__dynamic_tls_records_"$DTR_VER"%2B.patch -O /src/nginx/1.patch && \
     wget -q https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-"$RCP_VER"-resolver_conf_parsing.patch -O /src/nginx/2.patch && \
     sed -i "s|nginx/|NPMplus/|g" /src/nginx/src/core/nginx.h && \
     sed -i "s|Server: nginx|Server: NPMplus|g" /src/nginx/src/http/ngx_http_header_filter_module.c && \
