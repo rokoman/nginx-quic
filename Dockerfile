@@ -141,7 +141,7 @@ RUN apk upgrade --no-cache -a && \
     cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DWITH_OTLP_HTTP=ON -G Ninja && \
     ninja install && \
 # OpenTelemetry module
-    git clone https://github.com/open-telemetry/opentelemetry-cpp-contrib -branch /src/opentelemetry-cpp-contrib && \
+    git clone https://github.com/open-telemetry/opentelemetry-cpp-contrib /src/opentelemetry-cpp-contrib && \
     cd /src/opentelemetry-cpp-contrib/instrumentation/nginx && \
     cmake -G Ninja && \
     ninja && \
