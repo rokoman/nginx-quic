@@ -128,12 +128,12 @@ RUN apk upgrade --no-cache -a && \
 # liboqs
     git clone https://github.com/open-quantum-safe/liboqs --branch "$LIBOQS_VER" /src/liboqs && \
     cd /src/liboqs && \
-    cmake -DCMAKE_BUILD_TYPE=Release -G Ninja && \
+    cmake -G Ninja && \
     ninja install && \
 # oqs-provider
     git clone https://github.com/open-quantum-safe/oqs-provider --branch "$OQSPROVIDER_VER" /src/oqs-provider && \
     cd /src/oqs-provider && \
-    cmake -DCMAKE_BUILD_TYPE=Release -G Ninja && \
+    cmake -DOQS_KEM_ENCODERS=ON -G Ninja && \
     ninja && \
 # OpenTelemetry lib
     git clone https://github.com/open-telemetry/opentelemetry-cpp --branch "$OT_VER" /src/opentelemetry-cpp && \
