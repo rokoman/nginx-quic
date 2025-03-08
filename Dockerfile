@@ -36,7 +36,7 @@ RUN apk upgrade --no-cache -a && \
     apk add --no-cache ca-certificates build-base cmake ninja git libtool autoconf automake bash \
     libatomic_ops-dev zlib-dev luajit-dev pcre2-dev linux-headers yajl-dev libxml2-dev libxslt-dev curl-dev lmdb-dev libfuzzy2-dev lua5.1-dev lmdb-dev geoip-dev libmaxminddb-dev gtest-dev benchmark-dev protobuf-dev && \
 # ModSecurity
-    git clone --recursive https://github.com/owasp-modsecurity/ModSecurity --branch "$MODSEC_VER" /src/ModSecurity && \
+    git clone --recurse-submodules https://github.com/owasp-modsecurity/ModSecurity --branch "$MODSEC_VER" /src/ModSecurity && \
     cd /src/ModSecurity && \
     sed -i "s|SecRuleEngine .*|SecRuleEngine On|g" /src/ModSecurity/modsecurity.conf-recommended && \
     sed -i "s|^SecAudit|#SecAudit|g" /src/ModSecurity/modsecurity.conf-recommended && \
@@ -57,7 +57,7 @@ RUN apk upgrade --no-cache -a && \
     git apply /src/nginx/2.patch && \
     rm -v /src/nginx/*.patch && \
 # modules
-    git clone --recursive https://github.com/google/ngx_brotli --branch "$NB_VER" /src/ngx_brotli && \
+    git clone --recurse-submodules https://github.com/google/ngx_brotli --branch "$NB_VER" /src/ngx_brotli && \
     git clone https://github.com/aperezdc/ngx-fancyindex --branch "$NF_VER" /src/ngx-fancyindex && \
     git clone https://github.com/openresty/headers-more-nginx-module --branch "$HMNM_VER" /src/headers-more-nginx-module && \
     git clone https://github.com/nginx/njs --branch "$NJS_VER" /src/njs && \
@@ -105,15 +105,15 @@ RUN apk upgrade --no-cache -a && \
     --with-http_sub_module \
     --with-http_stub_status_module \
     --add-module=/src/ngx_brotli \
-    --add-module=/src/ngx-fancyindex \
-    --add-module=/src/headers-more-nginx-module \
-    --add-module=/src/njs/nginx \
     --add-module=/src/ngx_devel_kit \
     --add-module=/src/lua-nginx-module \
     --add-module=/src/ModSecurity-nginx \
-    --add-module=/src/ngx_http_geoip2_module \
-    --add-module=/src/nginx-ntlm-module \
-    --add-module=/src/nginx-module-vts && \
+    --add-module=/src/headers-more-nginx-module \
+    --add-dynamic-module=/src/ngx-fancyindex \
+    --add-dynamic-module=/src/ngx_http_geoip2_module \
+    --add-dynamic-module=/src/njs/nginx \
+    --add-dynamic-module=/src/nginx-ntlm-module \
+    --add-dynamic-module=/src/nginx-module-vts && \
 # Build & Install
     make -j "$(nproc)" install && \
     ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/nginx && \
@@ -124,10 +124,11 @@ RUN apk upgrade --no-cache -a && \
 # openappsec attachment
     git clone https://github.com/openappsec/attachment /src/attachment && \
     cd /src/attachment && \
-    patch -p1 </src/attachment.patch && \
+    git apply /src/attachment.patch && \
     rm -v /src/attachment.patch && \
     cmake /src/attachment -G Ninja && \
-    ninja install && \
+    ninja && \
+    mv -v /src/attachment/attachments/nginx/ngx_module/libngx_module.so /usr/local/nginx/modules/libngx_module.so && \
 # liboqs
     git clone https://github.com/open-quantum-safe/liboqs --branch "$LIBOQS_VER" /src/liboqs && \
     cd /src/liboqs && \
@@ -148,26 +149,28 @@ RUN apk upgrade --no-cache -a && \
     cd /src/opentelemetry-cpp-contrib/instrumentation/nginx && \
     cmake -G Ninja && \
     ninja && \
+    mv -v /src/opentelemetry-cpp-contrib/instrumentation/nginx/otel_ngx_module.so /usr/local/nginx/modules/otel_ngx_module.so && \
 # strip files
     strip -s /usr/local/nginx/sbin/nginx && \
+    find /usr/local/nginx/modules -name "*.so" -exec strip -s {} \; && \
     strip -s /src/oqs-provider/lib/oqsprovider.so && \
-    strip -s /usr/local/modsecurity/lib/libmodsecurity.so.3 && \
-    strip -s /usr/local/lib/libopentelemetry_proto.so && \
-    strip -s /src/opentelemetry-cpp-contrib/instrumentation/nginx/otel_ngx_module.so
+    strip -s /src/ModSecurity/src/.libs/libmodsecurity.so && \
+    strip -s /src/opentelemetry-cpp/libopentelemetry_proto.so && \
+    strip -s /src/attachment/core/shmem_ipc/libosrc_shmem_ipc.so && \
+    strip -s /src/attachment/core/compression/libosrc_compression_utils.so && \
+    strip -s /src/attachment/attachments/nginx/nginx_attachment_util/libosrc_nginx_attachment_util.so
 
 FROM alpine:3.21.3
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
-COPY --from=build /usr/local/nginx                                                        /usr/local/nginx
-COPY --from=build /src/oqs-provider/lib/oqsprovider.so                                    /usr/lib/ossl-modules/oqsprovider.so
-COPY --from=build /usr/local/modsecurity/lib/libmodsecurity.so.3                          /usr/local/lib/libmodsecurity.so.3
-COPY --from=build /usr/local/lib/libopentelemetry_proto.so                                /usr/local/lib/libopentelemetry_proto.so
-COPY --from=build /src/opentelemetry-cpp-contrib/instrumentation/nginx/otel_ngx_module.so /usr/local/lib/otel_ngx_module.so
-COPY --from=build /usr/local/lib/libngx_module.so                                         /usr/local/lib/libngx_module.so
-COPY --from=build /usr/local/lib/libosrc_shmem_ipc.so                                     /usr/local/lib/libosrc_shmem_ipc.so
-COPY --from=build /usr/local/lib/libosrc_compression_utils.so                             /usr/local/lib/libosrc_compression_utils.so
-COPY --from=build /usr/local/lib/libosrc_nginx_attachment_util.so                         /usr/local/lib/libosrc_nginx_attachment_util.so
-COPY --from=build /src/ModSecurity/unicode.mapping                                        /usr/local/nginx/conf/conf.d/include/unicode.mapping
-COPY --from=build /src/ModSecurity/modsecurity.conf-recommended                           /usr/local/nginx/conf/conf.d/include/modsecurity.conf.example
+COPY --from=build /usr/local/nginx                                                                         /usr/local/nginx
+COPY --from=build /src/oqs-provider/lib/oqsprovider.so                                                     /usr/lib/ossl-modules/oqsprovider.so
+COPY --from=build /src/ModSecurity/src/.libs/libmodsecurity.so                                             /usr/local/lib/libmodsecurity.so
+COPY --from=build /src/ModSecurity/unicode.mapping                                                         /usr/local/nginx/conf/conf.d/include/unicode.mapping
+COPY --from=build /src/ModSecurity/modsecurity.conf-recommended                                            /usr/local/nginx/conf/conf.d/include/modsecurity.conf.example
+COPY --from=build /src/opentelemetry-cpp/libopentelemetry_proto.so                                         /usr/local/lib/libopentelemetry_proto.so
+COPY --from=build /src/attachment/core/shmem_ipc/libosrc_shmem_ipc.so                                      /usr/local/lib/libosrc_shmem_ipc.so
+COPY --from=build /src/attachment/core/compression/libosrc_compression_utils.so                            /usr/local/lib/libosrc_compression_utils.so
+COPY --from=build /src/attachment/attachments/nginx/nginx_attachment_util/libosrc_nginx_attachment_util.so /usr/local/lib/libosrc_nginx_attachment_util.so
 RUN apk upgrade --no-cache -a && \
     apk add --no-cache ca-certificates tzdata tini zlib luajit pcre2 libstdc++ yajl libxml2 libxslt libcurl lmdb libfuzzy2 lua5.1-libs geoip libmaxminddb-libs libprotobuf openssl && \
     ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/nginx && \
