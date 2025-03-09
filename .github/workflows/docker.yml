@@ -119,6 +119,7 @@ jobs:
           username: ${{ steps.un.outputs.un }}
           password: ${{ github.token }}
       - name: create multiarch
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           docker buildx imagetools create --tag ${{ steps.un.outputs.un }}/${{ github.event.repository.name }}:${{ github.ref_name }} ghcr.io/${{ steps.un.outputs.un }}/${{ github.event.repository.name }}:${{ github.run_number }}-x86_64 ghcr.io/${{ steps.un.outputs.un }}/${{ github.event.repository.name }}:${{ github.run_number }}-aarch64
           docker buildx imagetools create --tag ${{ steps.un.outputs.un }}/${{ github.event.repository.name }}:${{ github.run_number }} ghcr.io/${{ steps.un.outputs.un }}/${{ github.event.repository.name }}:${{ github.run_number }}-x86_64 ghcr.io/${{ steps.un.outputs.un }}/${{ github.event.repository.name }}:${{ github.run_number }}-aarch64
@@ -191,6 +192,7 @@ jobs:
         id: pr
         run: echo "pr=$(echo pr-${{ github.ref_name }} | sed "s|refs/pull/:||g" | sed "s|/merge||g")" >> $GITHUB_OUTPUT
       - name: create multiarch
+        if: ${{ github.event_name == 'pull_request' }}
         run: docker buildx imagetools create --tag ghcr.io/${{ steps.un.outputs.un }}/${{ github.event.repository.name }}:${{ steps.pr.outputs.pr }} ghcr.io/${{ steps.un.outputs.un }}/${{ github.event.repository.name }}:${{ steps.pr.outputs.pr }}-x86_64 ghcr.io/${{ steps.un.outputs.un }}/${{ github.event.repository.name }}:${{ steps.pr.outputs.pr }}-aarch64
       - name: Build (PR)
         uses: docker/build-push-action@v6
