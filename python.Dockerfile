@@ -12,7 +12,7 @@ SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 COPY --from=zoeyvid/nginx-quic:latest /usr/local/nginx                                /usr/local/nginx
 COPY --from=zoeyvid/nginx-quic:latest /etc/ssl/openssl.cnf                            /etc/ssl/openssl.cnf
 COPY --from=zoeyvid/nginx-quic:latest /usr/lib/ossl-modules/oqsprovider.so            /usr/lib/ossl-modules/oqsprovider.so
-COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libmodsecurity.so                /usr/local/lib/libmodsecurity.so
+COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libmodsecurity.so.3              /usr/local/lib/libmodsecurity.so.3
 COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libopentelemetry_proto.so        /usr/local/lib/libopentelemetry_proto.so
 COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libosrc_shmem_ipc.so             /usr/local/lib/libosrc_shmem_ipc.so
 COPY --from=zoeyvid/nginx-quic:latest /usr/local/lib/libosrc_compression_utils.so     /usr/local/lib/libosrc_compression_utils.so
