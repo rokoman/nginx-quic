@@ -154,7 +154,7 @@ RUN apk upgrade --no-cache -a && \
     strip -s /usr/local/nginx/sbin/nginx && \
     find /usr/local/nginx/modules -name "*.so" -exec strip -s {} \; && \
     strip -s /src/oqs-provider/lib/oqsprovider.so && \
-    strip -s /src/ModSecurity/src/.libs/libmodsecurity.so && \
+    strip -s /src/ModSecurity/src/.libs/libmodsecurity.so.3 && \
     strip -s /src/opentelemetry-cpp/libopentelemetry_proto.so && \
     strip -s /src/attachment/core/shmem_ipc/libosrc_shmem_ipc.so && \
     strip -s /src/attachment/core/compression/libosrc_compression_utils.so && \
@@ -164,7 +164,7 @@ FROM alpine:3.21.3
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 COPY --from=build /usr/local/nginx                                                                         /usr/local/nginx
 COPY --from=build /src/oqs-provider/lib/oqsprovider.so                                                     /usr/lib/ossl-modules/oqsprovider.so
-COPY --from=build /src/ModSecurity/src/.libs/libmodsecurity.so                                             /usr/local/lib/libmodsecurity.so
+COPY --from=build /src/ModSecurity/src/.libs/libmodsecurity.so.3                                           /usr/local/lib/libmodsecurity.so.3
 COPY --from=build /src/ModSecurity/unicode.mapping                                                         /usr/local/nginx/conf/conf.d/include/unicode.mapping
 COPY --from=build /src/ModSecurity/modsecurity.conf-recommended                                            /usr/local/nginx/conf/conf.d/include/modsecurity.conf.example
 COPY --from=build /src/opentelemetry-cpp/libopentelemetry_proto.so                                         /usr/local/lib/libopentelemetry_proto.so
