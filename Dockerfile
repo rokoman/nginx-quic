@@ -109,7 +109,7 @@ RUN apk upgrade --no-cache -a && \
     --add-module=/src/lua-nginx-module \
     --add-module=/src/ModSecurity-nginx \
     --add-module=/src/headers-more-nginx-module \
-    --add-dynamic-module=/src/ngx-fancyindex \
+    --add-module=/src/ngx-fancyindex \
     --add-dynamic-module=/src/ngx_http_geoip2_module \
     --add-dynamic-module=/src/njs/nginx \
     --add-dynamic-module=/src/nginx-ntlm-module \
