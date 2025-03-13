@@ -12,7 +12,7 @@ ARG DTR_VER=1.27.4
 ARG RCP_VER=1.27.1
 
 ARG NB_VER=master
-ARG NF_VER=patch-1
+ARG NF_VER=master
 ARG HMNM_VER=v0.38
 ARG NJS_VER=0.8.9
 ARG NDK_VER=v0.3.4
@@ -58,7 +58,7 @@ RUN apk upgrade --no-cache -a && \
     rm -v /src/nginx/*.patch && \
 # modules
     git clone --recurse-submodules https://github.com/google/ngx_brotli --branch "$NB_VER" /src/ngx_brotli && \
-    git clone https://github.com/Zoey2936/ngx-fancyindex --branch "$NF_VER" /src/ngx-fancyindex && \
+    git clone https://github.com/aperezdc/ngx-fancyindex --branch "$NF_VER" /src/ngx-fancyindex && \
     git clone https://github.com/openresty/headers-more-nginx-module --branch "$HMNM_VER" /src/headers-more-nginx-module && \
     git clone https://github.com/nginx/njs --branch "$NJS_VER" /src/njs && \
     git clone https://github.com/vision5/ngx_devel_kit --branch "$NDK_VER" /src/ngx_devel_kit && \
