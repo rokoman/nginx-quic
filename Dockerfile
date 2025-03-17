@@ -85,6 +85,8 @@ RUN apk upgrade --no-cache -a && \
     --with-libatomic \
     --with-pcre \
     --with-pcre-jit \
+    --with-select_module \
+    --with-poll_module \
     --with-stream \
     --with-stream_ssl_module \
     --with-stream_ssl_preread_module \
@@ -96,16 +98,15 @@ RUN apk upgrade --no-cache -a && \
     --with-http_geoip_module \
     --with-http_realip_module \
     --with-http_gunzip_module \
-    --with-http_addition_module \
     --with-http_gzip_static_module \
-    --with-http_auth_request_module \
-    --with-http_geoip_module \
     --with-http_sub_module \
+    --with-http_addition_module \
     --with-http_stub_status_module \
-    --add-dynamic-module=/src/ngx_brotli \
-    --add-dynamic-module=/src/ngx_devel_kit \
-    --add-dynamic-module=/src/lua-nginx-module \
-    --add-dynamic-module=/src/ModSecurity-nginx \
+    --with-http_auth_request_module \
+    --add-module=/src/ngx_brotli \
+    --add-module=/src/ngx_devel_kit \
+    --add-module=/src/lua-nginx-module \
+    --add-module=/src/ModSecurity-nginx \
     --add-module=/src/headers-more-nginx-module \
     --add-dynamic-module=/src/ngx-fancyindex \
     --add-dynamic-module=/src/ngx_http_geoip2_module \
