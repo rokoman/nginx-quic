@@ -128,16 +128,6 @@ RUN apk upgrade --no-cache -a && \
     cmake /src/attachment -G Ninja && \
     ninja && \
     mv -v /src/attachment/attachments/nginx/ngx_module/libngx_module.so /usr/local/nginx/modules/libngx_module.so && \
-# liboqs
-    git clone https://github.com/open-quantum-safe/liboqs --branch "$LIBOQS_VER" /src/liboqs && \
-    cd /src/liboqs && \
-    cmake -G Ninja && \
-    ninja install && \
-# oqs-provider
-    git clone https://github.com/open-quantum-safe/oqs-provider --branch "$OQSPROVIDER_VER" /src/oqs-provider && \
-    cd /src/oqs-provider && \
-    cmake -DOQS_KEM_ENCODERS=ON -G Ninja && \
-    ninja && \
 # OpenTelemetry lib
     git clone https://github.com/open-telemetry/opentelemetry-cpp --branch "$OT_VER" /src/opentelemetry-cpp && \
     cd /src/opentelemetry-cpp && \
@@ -149,6 +139,16 @@ RUN apk upgrade --no-cache -a && \
     cmake -G Ninja && \
     ninja && \
     mv -v /src/opentelemetry-cpp-contrib/instrumentation/nginx/otel_ngx_module.so /usr/local/nginx/modules/otel_ngx_module.so && \
+# liboqs
+    git clone https://github.com/open-quantum-safe/liboqs --branch "$LIBOQS_VER" /src/liboqs && \
+    cd /src/liboqs && \
+    cmake -G Ninja && \
+    ninja install && \
+# oqs-provider
+    git clone https://github.com/open-quantum-safe/oqs-provider --branch "$OQSPROVIDER_VER" /src/oqs-provider && \
+    cd /src/oqs-provider && \
+    cmake -DOQS_KEM_ENCODERS=ON -G Ninja && \
+    ninja && \
 # strip files
     strip -s /usr/local/nginx/sbin/nginx && \
     find /usr/local/nginx/modules -name "*.so" -exec strip -s {} \; && \
