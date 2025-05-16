@@ -99,13 +99,10 @@ jobs:
         run: |
           git clone https://github.com/openresty/openresty openresty
           RCP_VER="$(
-          ls openresty/patches/nginx-*-resolver_conf_parsing.patch \
-              | sed "s|openresty/patches/nginx-\([0-9.]\+\)-resolver_conf_parsing.patch|\1|g" \
+          ls openresty/patches/nginx \
               | sort -V \
-              | grep -v rc \
               | tail -1
           )"
-          rm -r openresty
           sed -i "s|ARG RCP_VER=.*|ARG RCP_VER=$RCP_VER|" Dockerfile
           echo "version=$RCP_VER" >> $GITHUB_OUTPUT
       - name: Create Pull Request
