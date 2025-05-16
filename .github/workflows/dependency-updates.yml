@@ -103,6 +103,7 @@ jobs:
               | sort -V \
               | tail -1
           )"
+          rm -r openresty
           sed -i "s|ARG RCP_VER=.*|ARG RCP_VER=$RCP_VER|" Dockerfile
           echo "version=$RCP_VER" >> $GITHUB_OUTPUT
       - name: Create Pull Request
